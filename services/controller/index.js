@@ -1,37 +1,40 @@
-const express = require('express');
-const app = express();
-const port = 3000;
-
-// Importando os pacotes necessários
-const grpc = require('@grpc/grpc-js');
+const grpc = require('grpc');
 const protoLoader = require('@grpc/proto-loader');
 
+// Caminho para o arquivo .proto
+const PROTO_PATH = './proto/inventory.proto';
+
 // Carregando o arquivo .proto
-const packageDefinition = protoLoader.loadSync('proto/inventory.proto', {
-    keepCase: true,
-    longs: String,
-    enums: String,
-    arrays: true,
+const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
+  keepCase: true, // Mantém o nome das mensagens e serviços com a mesma capitalização do arquivo .proto
+  longs: String,  // Converte os números longos para strings
+  enums: String,  // Converte os enums para strings
+  defaults: true,  // Preenche valores ausentes com o valor padrão
+  oneofs: true     // Resolve problemas de campos "oneof"
 });
 
-const inventoryProto = grpc.loadPackageDefinition(packageDefinition).InventoryService;
+// Carregando o pacote do Protobuf
+const inventoryProto = grpc.loadPackageDefinition(packageDefinition).inventory;
 
-// Criando um cliente gRPC para o InventoryService
-const inventory = new inventoryProto('localhost:3002', grpc.credentials.createInsecure());
+// Criando o servidor gRPC
+const server = new grpc.Server();
 
-// Rota para pesquisar um produto por ID
-app.get('/product/:id', (req, res, next) => {
-    inventory.SearchProductByID({ id: req.params.id }, (err, product) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send({ error: 'something failed :(' });
-        } else {
-            res.json(product); // Retorna o produto encontrado
-        }
-    });
+// Implementação do serviço
+server.addService(inventoryProto.InventoryService.service, {
+  SearchProductByID: (call, callback) => {
+    // Lógica para SearchProductByID
+    callback(null, { id: '1', name: 'Produto 1', description: 'Descrição do produto 1' });
+  },
+  AddProduct: (call, callback) => {
+    // Lógica para AddProduct
+    callback(null, { message: 'Produto adicionado com sucesso!', success: true });
+  }
 });
 
-// Iniciando o servidor HTTP
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+// Iniciando o servidor na porta 3000
+server.bind('0.0.0.0:3000', grpc.ServerCredentials.createInsecure(), () => {
+  console.log('Servidor gRPC rodando na porta 3000');
 });
+
+// Iniciando o servidor
+server.start();

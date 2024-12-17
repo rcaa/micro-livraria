@@ -1,50 +1,37 @@
 const express = require('express');
-const shipping = require('./shipping');
-const inventory = require('./inventory');
-const cors = require('cors');
-
 const app = express();
-app.use(cors());
+const port = 3000;
 
-/**
- * Retorna a lista de produtos da loja via InventoryService
- */
-app.get('/products', (req, res, next) => {
-    inventory.SearchAllProducts(null, (err, data) => {
+// Importando os pacotes necessários
+const grpc = require('@grpc/grpc-js');
+const protoLoader = require('@grpc/proto-loader');
+
+// Carregando o arquivo .proto
+const packageDefinition = protoLoader.loadSync('proto/inventory.proto', {
+    keepCase: true,
+    longs: String,
+    enums: String,
+    arrays: true,
+});
+
+const inventoryProto = grpc.loadPackageDefinition(packageDefinition).InventoryService;
+
+// Criando um cliente gRPC para o InventoryService
+const inventory = new inventoryProto('localhost:3002', grpc.credentials.createInsecure());
+
+// Rota para pesquisar um produto por ID
+app.get('/product/:id', (req, res, next) => {
+    inventory.SearchProductByID({ id: req.params.id }, (err, product) => {
         if (err) {
             console.error(err);
             res.status(500).send({ error: 'something failed :(' });
         } else {
-            res.json(data.products);
+            res.json(product); // Retorna o produto encontrado
         }
     });
 });
 
-/**
- * Consulta o frete de envio no ShippingService
- */
-app.get('/shipping/:cep', (req, res, next) => {
-    shipping.GetShippingRate(
-        {
-            cep: req.params.cep,
-        },
-        (err, data) => {
-            if (err) {
-                console.error(err);
-                res.status(500).send({ error: 'something failed :(' });
-            } else {
-                res.json({
-                    cep: req.params.cep,
-                    value: data.value,
-                });
-            }
-        }
-    );
-});
-
-/**
- * Inicia o router
- */
-app.listen(3000, () => {
-    console.log('Controller Service running on http://127.0.0.1:3000');
+// Iniciando o servidor HTTP
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
 });

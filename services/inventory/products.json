@@ -1,26 +1,26 @@
 [
     {
         "id": 1,
-        "name": "Refactoring",
-        "author": "Martin Fowler",
+        "name": "Produto 1",
         "quantity": 10,
-        "price": 79.92,
-        "photo": "/img/refactoring.png"
+        "price": 19.99,
+        "photo": "url_da_imagem_1",
+        "author": "Autor 1"
     },
     {
         "id": 2,
-        "name": "Engenharia De Software Moderna",
-        "author": "Marco Tulio Valente",
-        "quantity": 10,
-        "price": 65.9,
-        "photo": "/img/esm.png"
+        "name": "Produto 2",
+        "quantity": 5,
+        "price": 29.99,
+        "photo": "url_da_imagem_2",
+        "author": "Autor 2"
     },
     {
         "id": 3,
-        "name": "Design Patterns",
-        "author": "Erich Gamma, John Vlissides, Richard Helm, Ralph Johnson",
-        "quantity": 10,
-        "price": 67.99,
-        "photo": "/img/design.png"
+        "name": "Produto 3",
+        "quantity": 20,
+        "price": 9.99,
+        "photo": "url_da_imagem_3",
+        "author": "Autor 3"
     }
 ]

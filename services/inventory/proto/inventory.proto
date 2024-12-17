@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package inventory;
+
+// Definição do serviço InventoryService
+service InventoryService {
+  rpc getInventory (Empty) returns (InventoryResponse);
+  rpc addInventory (InventoryItem) returns (AddInventoryResponse);
+}
+
+// Definição de mensagens
+message Empty {}
+
+message InventoryItem {
+  string name = 1;
+  int32 quantity = 2;
+}
+
+message InventoryResponse {
+  repeated string items = 1;
+}
+
+message AddInventoryResponse {
+  string status = 1;
+}

@@ -1,0 +1,39 @@
+const express = require('express');
+const grpc = require('grpc');
+const app = express();
+const port = 3000;
+
+// Exemplo de integração com o microsserviço InventoryService
+const inventoryProto = grpc.load('proto/inventory.proto'); // Carrega o arquivo .proto
+const inventory = new inventoryProto.InventoryService('localhost:3002', grpc.credentials.createInsecure()); // Acesse o serviço InventoryService
+
+// Rota para pesquisar um produto por ID
+app.get('/product/:id', (req, res, next) => {
+    inventory.SearchProductByID({ id: req.params.id }, (err, product) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send({ error: 'Something failed while fetching product.' });
+        } else {
+            res.json(product); // Retorna o produto encontrado
+        }
+    });
+});
+
+// Rota para adicionar um novo produto
+app.post('/product', express.json(), (req, res, next) => {
+    const productData = req.body;
+
+    inventory.AddProduct(productData, (err, response) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send({ error: 'Failed to add product.' });
+        } else {
+            res.status(201).send(response); // Retorna resposta de sucesso ao adicionar o produto
+        }
+    });
+});
+
+// Iniciando o servidor HTTP
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+});

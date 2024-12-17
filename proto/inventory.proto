@@ -1,11 +1,19 @@
 syntax = "proto3";
 
+package inventory;
+
+// Definição do serviço InventoryService
 service InventoryService {
     rpc SearchAllProducts(Empty) returns (ProductsResponse) {}
+    rpc SearchProductByID(Payload) returns (ProductResponse) {}
 }
 
-message Empty{}
+// Definição da mensagem Payload
+message Payload {
+    int32 id = 1;
+}
 
+// Definição da mensagem ProductResponse
 message ProductResponse {
     int32 id = 1;
     string name = 2;
@@ -15,6 +23,10 @@ message ProductResponse {
     string author = 6;
 }
 
+// Definição da mensagem ProductsResponse
 message ProductsResponse {
     repeated ProductResponse products = 1;
 }
+
+// Definição da mensagem Empty (caso necessário para a operação SearchAllProducts)
+message Empty {}

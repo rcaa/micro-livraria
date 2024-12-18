@@ -58,7 +58,7 @@ app.get('/product/:id', (req, res, next) => {
     });
 });
 
-d
+
 /**
  * Inicia o router
  */
